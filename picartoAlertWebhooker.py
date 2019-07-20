@@ -7,8 +7,6 @@ def parseUsers(jsonData):
     online = []
     for creator in jsonData:
         online.append(creator['name'].lower())
-    print(online)
-    exit()
     return online
 
 #Main execution starts here
@@ -19,8 +17,10 @@ while(True):
     webhooks = json.load(hooksFile)['webhooks']
     hooksFile.close()
     
-    errorState = false
+    error = False
     onlineCreators = []
+
+    print("Checking now...")
     try:
         onlineCreators = parseUsers(json.loads(requests.get("http://api.picarto.tv/v1/online?adult=true&gaming=true").text))
     except:
@@ -30,32 +30,34 @@ while(True):
     
     #Iterate over all servers
     for server in webhooks:
-        print("Checking: " + server['serverName'])
         if server['serverName'] not in creatorsSeen.keys():
             creatorsSeen[server['serverName']] = []
 
         #Iterate over all creators for that server
-        for creator.lower() in server['creators']:
+        for creator in server['creators']:
             #If a creator is online *and* has not already been announced to the server, announce to the server
             #Otherwise do nothing, if a previously seen creator returns offline, flag them as offline so they'll be announced next time they come online
-            if creator in onlineCreators:
-                if creator in creatorsSeen[server['serverName']]:
-                    continue
-                else:
-                    creatorsSeen[server['serverName']].append(creator)
+            if creator.lower() in onlineCreators:
+                if creator not in creatorsSeen[server['serverName']]:
                     try:
                         if server['useAtHere']:
                             requests.post(server['url'], {"content" :"@here " + creator + " has gone live on Picarto\nhttps://picarto.tv/" + creator})
                         else:
                             requests.post(server['url'], {"content" : creator + " has gone live on Picarto\nhttps://picarto.tv/" + creator})
+
+                        creatorsSeen[server['serverName']].append(creator)
                         print(creator + " now online.")
                     except:
-                        creatorsSeen[server['serverName']].remove(creator)
-                        errorState = true
+                        error = True
                         print("Couldn't reach discord server " + server["serverName"] + ". Retrying in 60 seconds.")
             else:
                 if creator in creatorsSeen[server['serverName']]:
                     creatorsSeen[server['serverName']].remove(creator)
                     print(creator + " now offline.")
+
     #Take a nap for three minutes
-    sleep(180)
+    if not error:
+        print("Check complete.")
+        sleep(180)
+    else: 
+        sleep(60)
