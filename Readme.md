@@ -13,7 +13,8 @@ An example of the webhooks.json required syntax is below:
             "creators": ["Creators", "Names", "Here"]
         }
     ]
-}```
+}
+```
 
 | Field      | Purpose                                                                                                  |
 | ---------- | -------------------------------------------------------------------------------------------------------- |
