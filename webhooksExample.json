@@ -1,0 +1,10 @@
+{
+    "webhooks": [
+        {
+            "serverName": "Example",
+            "useAtHere": false,
+            "url": "https://discordapp.com/api/webhooks/webhookURL",
+            "creators": ["Creators", "Names", "Here"]
+        }
+    ]
+}
