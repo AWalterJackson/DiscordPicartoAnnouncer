@@ -22,7 +22,7 @@ while(True):
 
     print("Checking now...")
     try:
-        onlineCreators = parseUsers(json.loads(requests.get("http://api.picarto.tv/v1/online?adult=true&gaming=true").text))
+        onlineCreators = parseUsers(json.loads(requests.get("http://api.picarto.tv/v1/online?adult=true&gaming=true", timeout=10).text))
     except:
         print("Error communicating with picarto, retrying in 60 seconds.")
         sleep(60)
@@ -41,9 +41,9 @@ while(True):
                 if creator not in creatorsSeen[server['serverName']]:
                     try:
                         if server['useAtHere']:
-                            requests.post(server['url'], {"content" :"@here " + creator + " has gone live on Picarto\nhttps://picarto.tv/" + creator})
+                            requests.post(server['url'], {"content" :"@here " + creator + " has gone live on Picarto\nhttps://picarto.tv/" + creator}, timeout=10)
                         else:
-                            requests.post(server['url'], {"content" : creator + " has gone live on Picarto\nhttps://picarto.tv/" + creator})
+                            requests.post(server['url'], {"content" : creator + " has gone live on Picarto\nhttps://picarto.tv/" + creator}, timeout=10)
 
                         creatorsSeen[server['serverName']].append(creator)
                         print(creator + " now online.")
